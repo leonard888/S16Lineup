@@ -3,97 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MPL ID S16: Comprehensive Meta Analysis</title>
+    <title>MPL ID S16: Meta Report & Draft Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Chosen Palette: Warm Neutrals (bg-stone-50, text-stone-900) with Strategic Accents (Purple/Blue/Red/Emerald) -->
-    <!-- Application Structure Plan: 
-         Merged the two reports into a 4-Tab Dashboard:
-         1. "Meta Landscape": Combines the 'Big Four' strategic pillars (New Report) with the Season Volume Stats (Old Report) to show both the 'Quality' and 'Quantity' of drafts.
-         2. "Hero Ecosystem": The qualitative breakdown of roles ('Power Picks', 'Priority Bans') from the Old Report.
-         3. "Strategic Deep Dive": Focuses on the 'Jungle Duality' (YSS vs Lance), Map Changes, and Tactical Counters from the New Report.
-         4. "Championship & Lineups": The Grand Final Case Study (ONIC vs AE), the 'Best Lineup' System, and the 'Lancelot Killer' blueprint.
-         This structure moves from High-Level Stats -> Specific Heroes -> Concepts -> Applied Strategy.
-    -->
-    <!-- Visualization & Content Choices:
-         - Chart.js Bar Charts: Used for both the "Big Four" P/B rates and the "Season Volume" (Nolan/Claude) stats.
-         - HTML Tables: Responsive color-coded table for the Grand Final Draft Matrix.
-         - Grid Layouts: Card-based layouts for Hero Roles and Counter Strategies.
-         - Interaction: Tab-based navigation with dynamic chart rendering/updating.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
+    <!-- Combined Styles -->
     <style>
-        body {
-            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-        }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 300px;
-            max-height: 400px;
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-            }
-        }
-        .nav-button {
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            transition: all 0.2s ease-in-out;
-            border: 1px solid #e7e5e4;
-            background-color: #f5f5f4;
-            color: #57534e;
-        }
-        .nav-button:hover {
-            background-color: #e7e5e4;
-        }
-        .nav-button.active {
-            background-color: #0284c7;
-            color: white;
-            border-color: #0369a1;
-        }
-        .content-card {
-             background-color: white;
-             border-radius: 0.75rem;
-             padding: 1.5rem;
-             box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-             border: 1px solid #e7e5e4;
-             height: 100%;
-        }
-        .kpi-card {
-            background-color: white;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            text-align: center;
-            border: 1px solid #e7e5e4;
-        }
-        /* Table Styling */
-        .draft-table th {
-            background-color: #f5f5f4;
-            padding: 0.75rem;
-            text-align: left;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #44403c;
-            border-bottom: 2px solid #e7e5e4;
-        }
-        .draft-table td {
-            padding: 0.75rem;
-            border-bottom: 1px solid #f5f5f4;
-            font-size: 0.875rem;
-        }
-        .draft-table tr:last-child td {
-            border-bottom: none;
-        }
+        body { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; }
+        
+        /* Report Styles */
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin: 0 auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        
+        .nav-button { padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.2s; border: 1px solid #e7e5e4; background-color: #f5f5f4; color: #57534e; }
+        .nav-button:hover { background-color: #e7e5e4; }
+        .nav-button.active { background-color: #0284c7; color: white; border-color: #0369a1; }
+        
+        .content-card { background-color: white; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e7e5e4; height: 100%; }
+        .kpi-card { background-color: white; border-radius: 0.75rem; padding: 1.5rem; text-align: center; border: 1px solid #e7e5e4; }
+        
+        .draft-table th { background-color: #f5f5f4; padding: 0.75rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #44403c; border-bottom: 2px solid #e7e5e4; }
+        .draft-table td { padding: 0.75rem; border-bottom: 1px solid #f5f5f4; font-size: 0.875rem; }
         .win-row { background-color: #f0fdf4; }
         .loss-row { background-color: #fef2f2; }
+
+        /* Drafter Styles */
+        .drafter-container { background-color: #0f172a; color: #f8fafc; } /* Dark mode isolation */
+        .slot { transition: all 0.2s; cursor: pointer; }
+        .slot:hover { border-color: #38bdf8; background-color: #1e293b; }
+        
+        .role-badge { font-size: 0.60rem; padding: 2px 5px; border-radius: 3px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .role-jungle { background: #15803d; color: #dcfce7; }
+        .role-roam { background: #7e22ce; color: #f3e8ff; }
+        .role-gold { background: #ca8a04; color: #fef9c3; }
+        .role-mid { background: #be123c; color: #ffe4e6; }
+        .role-exp { background: #b91c1c; color: #fee2e2; }
+
+        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Custom Scrollbar for Drafter Lists */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     </style>
 </head>
 <body class="bg-stone-50 text-stone-900 min-h-screen">
@@ -108,18 +61,17 @@
             </div>
         </header>
 
-        <nav class="sticky top-2 z-20 bg-stone-50/95 backdrop-blur py-2 flex flex-wrap justify-center gap-2 md:gap-4 mb-8 border-b border-stone-200">
+        <nav class="sticky top-2 z-30 bg-stone-50/95 backdrop-blur py-2 flex flex-wrap justify-center gap-2 md:gap-4 mb-8 border-b border-stone-200">
             <button id="btn-landscape" class="nav-button active">1. Meta Landscape</button>
             <button id="btn-ecosystem" class="nav-button">2. Hero Ecosystem</button>
             <button id="btn-strategy" class="nav-button">3. Strategic Deep Dive</button>
             <button id="btn-championship" class="nav-button">4. Championship Case Study</button>
+            <button id="btn-drafter" class="nav-button border-sky-600 text-sky-700 bg-sky-50 hover:bg-sky-100"><i class="fas fa-gamepad mr-2"></i>5. Draft Assistant</button>
         </nav>
 
         <main>
-            <!-- SECTION 1: META LANDSCAPE (Combined Stats) -->
+            <!-- SECTION 1: META LANDSCAPE -->
             <section id="content-landscape" class="space-y-10 animate-fade-in">
-                
-                <!-- The Big Four (New Report) -->
                 <div class="space-y-6">
                     <div class="text-center max-w-3xl mx-auto">
                         <h2 class="text-2xl font-bold text-stone-800">The "Big Four" Architectural Pillars</h2>
@@ -148,270 +100,157 @@
                         </div>
                     </div>
                 </div>
-
                 <hr class="border-stone-200">
-
-                <!-- Season Volume Stats (Old Report) -->
                 <div class="space-y-6">
                     <div class="text-center max-w-3xl mx-auto">
                         <h2 class="text-2xl font-bold text-stone-800">Season Volume Leaders</h2>
-                        <p class="text-stone-600 text-sm mt-2">Highest volume appearances across all 172 games (Raw Contest Rate).</p>
+                        <p class="text-stone-600 text-sm mt-2">Highest volume appearances across all 172 games.</p>
                     </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                        <div class="kpi-card">
-                            <div class="text-3xl font-bold text-sky-600">93</div>
-                            <div class="text-sm text-stone-500">Unique Heroes</div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="text-3xl font-bold text-sky-600">155</div>
-                            <div class="text-sm text-stone-500">Nolan Contested</div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="text-3xl font-bold text-sky-600">102</div>
-                            <div class="text-sm text-stone-500">Diggie Bans</div>
-                        </div>
-                    </div>
-
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <div class="content-card">
                             <h3 class="text-lg font-bold text-center mb-4">Most Contested (Raw Volume)</h3>
-                            <div class="chart-container">
-                                <canvas id="contestedChart"></canvas>
-                            </div>
+                            <div class="chart-container"><canvas id="contestedChart"></canvas></div>
                         </div>
                         <div class="content-card">
                             <h3 class="text-lg font-bold text-center mb-4">Highest Win Rates (>10 Games)</h3>
-                            <div class="chart-container">
-                                <canvas id="winRateChart"></canvas>
-                            </div>
+                            <div class="chart-container"><canvas id="winRateChart"></canvas></div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- SECTION 2: HERO ECOSYSTEM (Qualitative Roles) -->
-            <section id="content-ecosystem" class="space-y-10 hidden">
+            <!-- SECTION 2: HERO ECOSYSTEM -->
+            <section id="content-ecosystem" class="space-y-10 hidden animate-fade-in">
                 <div class="text-center max-w-3xl mx-auto">
                     <h2 class="text-2xl font-bold text-stone-800">The Hero Ecosystem</h2>
                     <p class="text-stone-600 mt-2">Qualitative categorization of the most impactful heroes.</p>
                 </div>
-
+                <!-- Power Picks -->
                 <div>
-                    <h3 class="text-xl font-bold text-sky-800 mb-4 border-b border-sky-200 pb-2">The Power Picks (High Pick + High WR)</h3>
+                    <h3 class="text-xl font-bold text-sky-800 mb-4 border-b border-sky-200 pb-2">The Power Picks</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="content-card">
-                            <h4 class="font-bold text-sky-700 mb-1">Claude (Gold)</h4>
-                            <div class="text-xs font-bold bg-sky-100 text-sky-800 inline-block px-2 py-1 rounded mb-2">62.9% WR</div>
-                            <p class="text-sm text-stone-700">The premier marksman. High mobility and massive late-game AoE damage. Difficult to lock down.</p>
-                        </div>
-                        <div class="content-card">
-                            <h4 class="font-bold text-sky-700 mb-1">Baxia (Jungle)</h4>
-                            <div class="text-xs font-bold bg-sky-100 text-sky-800 inline-block px-2 py-1 rounded mb-2">63.2% WR</div>
-                            <p class="text-sm text-stone-700">Fast rotations, durable, and built-in anti-heal. Disrupts enemy backlines effectively.</p>
-                        </div>
-                        <div class="content-card">
-                            <h4 class="font-bold text-sky-700 mb-1">Nolan (Jungle)</h4>
-                            <div class="text-xs font-bold bg-sky-100 text-sky-800 inline-block px-2 py-1 rounded mb-2">Most Picked (88)</div>
-                            <p class="text-sm text-stone-700">The default assassin. Exceptional clear speed, burst, and "Get in, Get out" capability.</p>
-                        </div>
+                        <div class="content-card"><h4 class="font-bold text-sky-700 mb-1">Claude (Gold)</h4><div class="text-xs font-bold bg-sky-100 text-sky-800 inline-block px-2 py-1 rounded mb-2">62.9% WR</div><p class="text-sm text-stone-700">The premier marksman. High mobility and massive late-game AoE damage.</p></div>
+                        <div class="content-card"><h4 class="font-bold text-sky-700 mb-1">Baxia (Jungle)</h4><div class="text-xs font-bold bg-sky-100 text-sky-800 inline-block px-2 py-1 rounded mb-2">63.2% WR</div><p class="text-sm text-stone-700">Fast rotations, durable, and built-in anti-heal.</p></div>
+                        <div class="content-card"><h4 class="font-bold text-sky-700 mb-1">Nolan (Jungle)</h4><div class="text-xs font-bold bg-sky-100 text-sky-800 inline-block px-2 py-1 rounded mb-2">Most Picked</div><p class="text-sm text-stone-700">Exceptional clear speed, burst, and "Get in, Get out" capability.</p></div>
                     </div>
                 </div>
-
+                <!-- Priority Bans -->
                 <div>
-                    <h3 class="text-xl font-bold text-red-800 mb-4 border-b border-red-200 pb-2">The Priority Bans (Too Toxic to Play Against)</h3>
+                    <h3 class="text-xl font-bold text-red-800 mb-4 border-b border-red-200 pb-2">The Priority Bans</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="content-card">
-                            <h4 class="font-bold text-red-700 mb-1">Diggie (Roam)</h4>
-                            <div class="text-xs font-bold bg-red-100 text-red-800 inline-block px-2 py-1 rounded mb-2">102 Bans</div>
-                            <p class="text-sm text-stone-700">The "Fun-Killer". Team-wide purify nullifies engage compositions completely.</p>
-                        </div>
-                        <div class="content-card">
-                            <h4 class="font-bold text-red-700 mb-1">Joy (Flex)</h4>
-                            <div class="text-xs font-bold bg-red-100 text-red-800 inline-block px-2 py-1 rounded mb-2">85 Bans</div>
-                            <p class="text-sm text-stone-700">Slippery, CC-immune during ult, and high backline burst. Extremely frustrating to counter.</p>
-                        </div>
-                        <div class="content-card">
-                            <h4 class="font-bold text-red-700 mb-1">Mathilda (Roam)</h4>
-                            <div class="text-xs font-bold bg-red-100 text-red-800 inline-block px-2 py-1 rounded mb-2">77 Bans</div>
-                            <p class="text-sm text-stone-700">Provides free "Flicker" to teammates. Enables unparalleled team mobility.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <h3 class="text-xl font-bold text-emerald-800 mb-4 border-b border-emerald-200 pb-2">Situational Aces (The Specific Counters)</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="content-card">
-                            <h4 class="font-bold text-emerald-700 mb-1">Kaja (Roam/Exp)</h4>
-                            <div class="text-xs font-bold bg-emerald-100 text-emerald-800 inline-block px-2 py-1 rounded mb-2">71.4% WR</div>
-                            <p class="text-sm text-stone-700">The ultimate pick-off tool (Suppression). Counters high-mobility heroes like Nolan/Joy.</p>
-                        </div>
-                        <div class="content-card">
-                            <h4 class="font-bold text-emerald-700 mb-1">Luo Yi (Mid)</h4>
-                            <div class="text-xs font-bold bg-emerald-100 text-emerald-800 inline-block px-2 py-1 rounded mb-2">66.7% WR</div>
-                            <p class="text-sm text-stone-700">High AoE damage and global rotation via ultimate. Creates instant ganks.</p>
-                        </div>
-                        <div class="content-card">
-                            <h4 class="font-bold text-emerald-700 mb-1">Khaleed (Exp)</h4>
-                            <div class="text-xs font-bold bg-emerald-100 text-emerald-800 inline-block px-2 py-1 rounded mb-2">63.6% WR</div>
-                            <p class="text-sm text-stone-700">Early game bully with immense sustain. Thrives in the chaotic mid-game fights.</p>
-                        </div>
+                        <div class="content-card"><h4 class="font-bold text-red-700 mb-1">Diggie (Roam)</h4><div class="text-xs font-bold bg-red-100 text-red-800 inline-block px-2 py-1 rounded mb-2">102 Bans</div><p class="text-sm text-stone-700">Team-wide purify nullifies engage compositions completely.</p></div>
+                        <div class="content-card"><h4 class="font-bold text-red-700 mb-1">Joy (Flex)</h4><div class="text-xs font-bold bg-red-100 text-red-800 inline-block px-2 py-1 rounded mb-2">85 Bans</div><p class="text-sm text-stone-700">Slippery, CC-immune during ult, and high backline burst.</p></div>
+                        <div class="content-card"><h4 class="font-bold text-red-700 mb-1">Mathilda (Roam)</h4><div class="text-xs font-bold bg-red-100 text-red-800 inline-block px-2 py-1 rounded mb-2">77 Bans</div><p class="text-sm text-stone-700">Provides free "Flicker" to teammates.</p></div>
                     </div>
                 </div>
             </section>
 
             <!-- SECTION 3: STRATEGIC DEEP DIVE -->
-            <section id="content-strategy" class="space-y-10 hidden">
+            <section id="content-strategy" class="space-y-10 hidden animate-fade-in">
                 <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-2xl font-bold text-stone-800">Strategic Deep Dive</h2>
                     <p class="text-stone-600 mt-2">Map Dynamics and the Jungle Duality.</p>
                 </div>
-
-                <!-- Jungle Duality -->
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="content-card border-t-4 border-blue-600">
                         <h3 class="text-lg font-bold text-blue-800 mb-2">MACRO: Yi Sun-shin</h3>
                         <div class="text-xs text-stone-500 uppercase tracking-wider font-bold mb-4">The Strategic Weapon</div>
-                        <p class="text-stone-700 text-sm mb-4">Value lies in <strong>Mountain Shocker</strong>. It provides global vision, revealing enemy rotations. The "Dangerous Grass" map update made his vision critical to prevent ambushes.</p>
-                        <div class="bg-blue-50 p-2 rounded text-xs text-blue-800 font-bold text-center">Status: S-Tier (100% Grand Final Ban)</div>
+                        <p class="text-stone-700 text-sm mb-4">Value lies in <strong>Mountain Shocker</strong>. It provides global vision. The "Dangerous Grass" map update made his vision critical.</p>
                     </div>
                     <div class="content-card border-t-4 border-yellow-500">
                         <h3 class="text-lg font-bold text-yellow-800 mb-2">MICRO: Lancelot</h3>
                         <div class="text-xs text-stone-500 uppercase tracking-wider font-bold mb-4">The Tactical Weapon</div>
-                        <p class="text-stone-700 text-sm mb-4">The premier mechanical assassin capable of ending games through skill. "Broken Walls" buffed his mobility, but he requires perfect execution.</p>
-                        <div class="bg-yellow-50 p-2 rounded text-xs text-yellow-800 font-bold text-center">Status: A-Tier (High Risk, High Reward)</div>
-                    </div>
-                </div>
-
-                <!-- Lancelot Counters -->
-                <div class="space-y-4">
-                    <h3 class="text-xl font-bold text-stone-800 text-center">Tactical Guide: Countering Lancelot</h3>
-                    <div class="grid md:grid-cols-3 gap-4">
-                        <div class="content-card border-l-4 border-red-500">
-                            <h4 class="font-bold text-stone-800">Silvanna</h4>
-                            <p class="text-xs text-red-600 font-bold mb-2">Ultimate: Imperial Justice</p>
-                            <p class="text-sm text-stone-600">Creates a cage Lancelot cannot dash out of. Outlasts his burst combo.</p>
-                        </div>
-                        <div class="content-card border-l-4 border-red-500">
-                            <h4 class="font-bold text-stone-800">Ruby</h4>
-                            <p class="text-xs text-red-600 font-bold mb-2">Passive: Gap Closing CC</p>
-                            <p class="text-sm text-stone-600">Interrupts his dash flow. Absorbs his burst with massive lifesteal.</p>
-                        </div>
-                        <div class="content-card border-l-4 border-red-500">
-                            <h4 class="font-bold text-stone-800">Chou</h4>
-                            <p class="text-xs text-red-600 font-bold mb-2">Ultimate: Way of Dragon</p>
-                            <p class="text-sm text-stone-600">Outmaneuvers him and kicks him into fatal, out-of-position locations.</p>
-                        </div>
+                        <p class="text-stone-700 text-sm mb-4">The premier mechanical assassin. "Broken Walls" buffed his mobility, but requires perfect execution.</p>
                     </div>
                 </div>
             </section>
 
-            <!-- SECTION 4: CHAMPIONSHIP ANALYSIS -->
-            <section id="content-championship" class="space-y-12 hidden">
-                
-                <!-- Grand Final Matrix -->
+            <!-- SECTION 4: CHAMPIONSHIP CASE STUDY -->
+            <section id="content-championship" class="space-y-12 hidden animate-fade-in">
                 <div class="content-card overflow-hidden">
                     <div class="mb-4 text-center">
                         <h3 class="text-xl font-bold text-stone-800">Grand Final Case Study: ONIC vs Alter Ego</h3>
-                        <p class="text-sm text-stone-500">S-Tier Bans (Zhuxin/YSS) were 100%. The battle was Hayabusa vs. Lancelot.</p>
+                        <p class="text-sm text-stone-500">Battle of Hayabusa vs. Lancelot.</p>
                     </div>
-                    
                     <div class="overflow-x-auto">
                         <table class="w-full draft-table whitespace-nowrap">
-                            <thead>
-                                <tr>
-                                    <th>Game</th>
-                                    <th>Winner</th>
-                                    <th>Draft Narrative</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Game</th><th>Winner</th><th>Draft Narrative</th></tr></thead>
                             <tbody>
-                                <tr class="loss-row text-stone-500">
-                                    <td class="font-bold">G1</td>
-                                    <td>Alter Ego</td>
-                                    <td><strong>The Anomaly.</strong> AE's dive comp shuts down ONIC's Lancelot. ONIC learns Lancelot is risky.</td>
-                                </tr>
-                                <tr class="win-row">
-                                    <td class="font-bold">G2</td>
-                                    <td>ONIC</td>
-                                    <td><strong>The Adaptation.</strong> ONIC steals Haya/Kimmy. Picks Gatot/Ruby to hard-counter AE's Lancelot.</td>
-                                </tr>
-                                <tr class="win-row">
-                                    <td class="font-bold">G3</td>
-                                    <td>ONIC</td>
-                                    <td><strong>Space Denial.</strong> ONIC picks Yve. Her slow-field cripples Lancelot's dash mechanics.</td>
-                                </tr>
-                                <tr class="win-row">
-                                    <td class="font-bold">G4</td>
-                                    <td>ONIC</td>
-                                    <td><strong>The Tilt.</strong> ONIC forces AE to pick Haya, then beats them with a superior Lancelot comp.</td>
-                                </tr>
-                                <tr class="win-row">
-                                    <td class="font-bold">G5</td>
-                                    <td>ONIC</td>
-                                    <td><strong>Checkmate.</strong> AE draft shattered. ONIC reverts to their "Best Lineup" Core.</td>
-                                </tr>
+                                <tr class="loss-row text-stone-500"><td class="font-bold">G1</td><td>AE</td><td><strong>The Anomaly.</strong> AE's dive comp shuts down ONIC's Lancelot.</td></tr>
+                                <tr class="win-row"><td class="font-bold">G2</td><td>ONIC</td><td><strong>The Adaptation.</strong> ONIC steals Haya/Kimmy. Picks Gatot/Ruby counter.</td></tr>
+                                <tr class="win-row"><td class="font-bold">G3</td><td>ONIC</td><td><strong>Space Denial.</strong> ONIC picks Yve to cripple Lancelot.</td></tr>
+                                <tr class="win-row"><td class="font-bold">G4</td><td>ONIC</td><td><strong>The Tilt.</strong> ONIC forces AE to pick Haya, beats them with Lancelot.</td></tr>
+                                <tr class="win-row"><td class="font-bold">G5</td><td>ONIC</td><td><strong>Checkmate.</strong> ONIC reverts to "Best Lineup" Core.</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
+            </section>
 
-                <!-- The Best Lineup -->
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div class="content-card bg-stone-900 text-white">
-                        <h3 class="text-xl font-bold text-center mb-4 text-sky-400">🏆 The "Best Lineup" System</h3>
-                        <p class="text-center text-xs text-stone-400 mb-6">ONIC's Adaptive Championship Blueprint</p>
-                        <ul class="space-y-4">
-                            <li class="flex items-start gap-3">
-                                <span class="bg-sky-500 text-white text-xs font-bold px-2 py-1 rounded">CORE</span>
-                                <div>
-                                    <span class="font-bold block">Hayabusa (Jungle)</span>
-                                    <span class="text-xs text-stone-300">Preferred A-Tier comfort over high-risk Lancelot.</span>
-                                </div>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <span class="bg-sky-500 text-white text-xs font-bold px-2 py-1 rounded">DPS</span>
-                                <div>
-                                    <span class="font-bold block">Kimmy (Mid) + Cici (Flex)</span>
-                                    <span class="text-xs text-stone-300">Sustained magic damage + high mobility chasing.</span>
-                                </div>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <span class="bg-sky-500 text-white text-xs font-bold px-2 py-1 rounded">ADAPT</span>
-                                <div>
-                                    <span class="font-bold block">Flex Slot (Yve/Gatot)</span>
-                                    <span class="text-xs text-stone-300">Used to deny space or counter specific enemy threats.</span>
-                                </div>
-                            </li>
-                        </ul>
+            <!-- SECTION 5: DRAFT ASSISTANT (Dark Mode Module) -->
+            <section id="content-drafter" class="hidden animate-fade-in">
+                <div class="drafter-container rounded-xl shadow-2xl border border-slate-800 overflow-hidden">
+                    <!-- Drafter Header -->
+                    <div class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center">
+                        <div>
+                            <h2 class="text-xl font-bold text-sky-400 flex items-center gap-2"><i class="fas fa-chess-knight"></i> Draft Assistant</h2>
+                            <p class="text-xs text-slate-400">Full MLBB Roster • S16 Meta Logic • 5v5 Bans</p>
+                        </div>
+                        <button onclick="resetDraft()" class="text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded border border-slate-700 transition"><i class="fas fa-redo-alt mr-1"></i> RESET</button>
                     </div>
 
-                    <div class="content-card bg-red-50 border-red-100">
-                        <h3 class="text-xl font-bold text-center mb-4 text-red-700">🛡️ The "Lancelot-Killer" Comp</h3>
-                        <p class="text-center text-xs text-stone-500 mb-6">Blueprint from LB Final (AE vs EVOS)</p>
-                        <div class="grid grid-cols-2 gap-2 text-sm">
-                            <div class="bg-white p-2 rounded border border-red-100">
-                                <span class="font-bold block text-stone-800">Gatotkaca</span>
-                                <span class="text-xs text-red-600">Hard CC Stop</span>
-                            </div>
-                            <div class="bg-white p-2 rounded border border-red-100">
-                                <span class="font-bold block text-stone-800">Yve</span>
-                                <span class="text-xs text-red-600">Space Denial</span>
-                            </div>
-                            <div class="bg-white p-2 rounded border border-red-100">
-                                <span class="font-bold block text-stone-800">Yi Sun-shin</span>
-                                <span class="text-xs text-red-600">Macro Vision</span>
-                            </div>
-                            <div class="bg-white p-2 rounded border border-red-100">
-                                <span class="font-bold block text-stone-800">Lapu-Lapu</span>
-                                <span class="text-xs text-red-600">Counter Dive</span>
+                    <!-- Drafter Body -->
+                    <div class="p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <!-- LEFT: Board -->
+                        <div class="lg:col-span-7 space-y-6">
+                            <div class="grid grid-cols-2 gap-4 md:gap-6">
+                                <!-- My Team -->
+                                <div class="space-y-4">
+                                    <div class="bg-slate-900/80 p-3 rounded-xl border border-red-900/20">
+                                        <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 text-center">My Bans</h3>
+                                        <div class="grid grid-cols-5 gap-1 md:gap-2" id="my-bans-container"></div>
+                                    </div>
+                                    <div class="bg-slate-900/50 p-4 rounded-xl border border-sky-900/30 min-h-[360px] relative">
+                                        <div class="absolute top-0 left-0 w-1 h-full bg-sky-600/20 rounded-l-xl"></div>
+                                        <div class="flex justify-between items-center mb-4 pl-2">
+                                            <h2 class="text-sky-400 font-bold uppercase tracking-wider text-sm">My Team</h2>
+                                            <span id="my-roles" class="text-xs text-slate-500 font-mono">0/5</span>
+                                        </div>
+                                        <div class="space-y-3" id="my-team-container"></div>
+                                    </div>
+                                </div>
+                                <!-- Enemy Team -->
+                                <div class="space-y-4">
+                                    <div class="bg-slate-900/80 p-3 rounded-xl border border-red-900/20">
+                                        <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 text-center">Enemy Bans</h3>
+                                        <div class="grid grid-cols-5 gap-1 md:gap-2" id="enemy-bans-container"></div>
+                                    </div>
+                                    <div class="bg-slate-900/50 p-4 rounded-xl border border-red-900/30 min-h-[360px] relative">
+                                        <div class="absolute top-0 right-0 w-1 h-full bg-red-600/20 rounded-r-xl"></div>
+                                        <div class="flex justify-between items-center mb-4 pr-2">
+                                            <h2 class="text-red-400 font-bold uppercase tracking-wider text-sm">Enemy Team</h2>
+                                            <span id="enemy-roles" class="text-xs text-slate-500 font-mono">0/5</span>
+                                        </div>
+                                        <div class="space-y-3" id="enemy-team-container"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <p class="text-xs text-stone-600 mt-4 text-center italic">"Attacks Lancelot from five angles: Space, Vision, CC, Counter-Dive, and Chase."</p>
+
+                        <!-- RIGHT: Recommendations -->
+                        <div class="lg:col-span-5 flex flex-col h-[600px] lg:h-auto">
+                            <div class="bg-slate-900 rounded-xl border border-slate-800 shadow-lg flex flex-col h-full overflow-hidden">
+                                <div class="p-4 border-b border-slate-800 bg-slate-900 z-10">
+                                    <h2 class="text-lg font-bold text-emerald-400 flex items-center gap-2"><i class="fas fa-brain"></i> AI Suggestion</h2>
+                                    <p class="text-[10px] text-slate-500 mt-0.5">Live analysis of Counters & Synergies</p>
+                                </div>
+                                <div id="recommendation-list" class="flex-grow overflow-y-auto p-4 space-y-3 bg-slate-950/50 custom-scroll"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
+
         </main>
 
         <footer class="mt-12 pt-8 border-t border-stone-200 text-center text-stone-500 text-sm pb-8">
@@ -419,24 +258,179 @@
         </footer>
     </div>
 
+    <!-- HERO SELECTOR MODAL (Shared) -->
+    <div id="hero-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 w-full max-w-3xl rounded-xl border border-slate-700 shadow-2xl flex flex-col max-h-[85vh]">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50">
+                <h3 class="font-bold text-white text-lg" id="modal-title">Select Hero</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-700 transition"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-4 border-b border-slate-800 space-y-3">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-3 top-3 text-slate-500"></i>
+                    <input type="text" id="hero-search" placeholder="Search 120+ heroes..." class="w-full bg-slate-950 border border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-sky-500 text-sm shadow-inner">
+                </div>
+                <div class="flex gap-2 overflow-x-auto pb-2 custom-scroll">
+                    <button onclick="filterHeroes('All')" class="filter-btn active px-4 py-1.5 rounded-md text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors text-white">All</button>
+                    <button onclick="filterHeroes('Jungle')" class="filter-btn px-4 py-1.5 rounded-md text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors text-green-400">Jungle</button>
+                    <button onclick="filterHeroes('Roam')" class="filter-btn px-4 py-1.5 rounded-md text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors text-purple-400">Roam</button>
+                    <button onclick="filterHeroes('Mid')" class="filter-btn px-4 py-1.5 rounded-md text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors text-pink-400">Mid</button>
+                    <button onclick="filterHeroes('Gold')" class="filter-btn px-4 py-1.5 rounded-md text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors text-yellow-400">Gold</button>
+                    <button onclick="filterHeroes('Exp')" class="filter-btn px-4 py-1.5 rounded-md text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors text-red-400">Exp</button>
+                </div>
+            </div>
+            <div id="hero-grid" class="flex-grow overflow-y-auto p-4 grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2 bg-slate-950 custom-scroll"></div>
+        </div>
+    </div>
+
     <script>
+        // --- DATA SECTION ---
+        const heroDatabase = [
+            // META GODS (S16)
+            { name: "Zhuxin", role: "Mid", tier: 10, notes: "Permaban Status. Lane Dominance.", weakVs: ["Helcurt", "Saber"], strongVs: ["Immobile Mages"] },
+            { name: "Yi Sun-shin", role: "Jungle", tier: 10, notes: "Global Vision. Macro God.", weakVs: ["Early Invades"], strongVs: ["Hidden Comps", "Natalia"] },
+            { name: "Lancelot", role: "Jungle", tier: 9, notes: "Infinite Dash. High Skill.", weakVs: ["Gatotkaca", "Ruby", "Yve", "Minsitthar", "Phoveus", "Khufra"], strongVs: ["Immobile Backlines"] },
+            { name: "Gatotkaca", role: "Roam", tier: 9, notes: "Anti-Dive/Anti-Dash.", weakVs: ["Karrie", "Valir"], strongVs: ["Lancelot", "Joy", "Fanny", "Nolan"] },
+            { name: "Nolan", role: "Jungle", tier: 9, notes: "Fastest Clear. Burst.", weakVs: ["Kaja", "Diggie", "Minsitthar"], strongVs: ["Squishies"] },
+            { name: "Mathilda", role: "Roam", tier: 9, notes: "Free Flicker.", weakVs: ["Minsitthar", "Khufra"], strongVs: ["Pick-off"] },
+            { name: "Joy", role: "Exp", tier: 9, notes: "Unstoppable Dash.", weakVs: ["Minsitthar", "Phoveus", "Kaja"], strongVs: ["Immobile"] },
+            { name: "Diggie", role: "Roam", tier: 9, notes: "Anti-CC God.", weakVs: ["Burst Assassins"], strongVs: ["Atlas", "Tigreal", "Minotaur", "Guinevere"] },
+            // A-Tier
+            { name: "Arlott", role: "Exp", tier: 8, notes: "CC Chain & Sustain.", weakVs: ["Minsitthar", "Phoveus"], strongVs: ["Assassins"] },
+            { name: "Claude", role: "Gold", tier: 8, notes: "Late Game AoE.", weakVs: ["Kaja", "Belerick", "Lesley"], strongVs: ["Tanky Comps"] },
+            { name: "Baxia", role: "Jungle", tier: 8, notes: "Anti-Heal Tank.", weakVs: ["Karrie", "Valir"], strongVs: ["Estes", "Floryn", "Yu Zhong"] },
+            { name: "Hayabusa", role: "Jungle", tier: 8, notes: "Split Push/Pick-off.", weakVs: ["Kaja", "Khufra", "Eudora"], strongVs: ["Isolated Targets"], synergies: ["Cici", "Kimmy"] },
+            { name: "Cici", role: "Exp", tier: 8, notes: "Kiting Specialist.", weakVs: ["Burst"], strongVs: ["Melee Fighters"], synergies: ["Hayabusa"] },
+            { name: "Kimmy", role: "Mid", tier: 7, notes: "Magic DPS.", weakVs: ["Lolita", "Radiant Armor"], strongVs: ["Melee Comps"] },
+            { name: "Kaja", role: "Roam", tier: 8, notes: "Suppression.", weakVs: ["Purify (Partial)"], strongVs: ["Nolan", "Joy", "Fanny"] },
+            { name: "Luo Yi", role: "Mid", tier: 8, notes: "Global Teleport.", weakVs: ["Assassins"], strongVs: ["Grouped Enemies"] },
+            { name: "Ruby", role: "Roam", tier: 8, notes: "CC Machine.", weakVs: ["Baxia"], strongVs: ["Fanny", "Lancelot", "Arlott"] },
+            { name: "Yve", role: "Mid", tier: 8, notes: "Zoning Slow.", weakVs: ["Divers"], strongVs: ["Lancelot", "Immobile"] },
+            { name: "Fredrinn", role: "Jungle", tier: 8, notes: "Tanky Utility.", weakVs: ["Karrie", "Valir"], strongVs: ["Burst Assassins"] },
+            { name: "Terizla", role: "Exp", tier: 8, notes: "Teamfight CC.", weakVs: ["Valir", "Karrie"], strongVs: ["Immobile"] },
+            { name: "Yu Zhong", role: "Exp", tier: 8, notes: "Backline Diver.", weakVs: ["Baxia"], strongVs: ["Mages", "Marksmen"] },
+            { name: "Angela", role: "Roam", tier: 8, notes: "Global Shield.", weakVs: ["Burst"], strongVs: ["Poke"] },
+            { name: "Valentina", role: "Mid", tier: 8, notes: "Ult Steal.", weakVs: ["Burst"], strongVs: ["Faramis", "Diggie", "Atlas"] },
+            { name: "Faramis", role: "Mid", tier: 8, notes: "Resurrection.", weakVs: ["Valentina"], strongVs: ["Burst Comps"] },
+            { name: "Edith", role: "Exp", tier: 8, notes: "Tank/Marksman Hybrid.", weakVs: ["Burst"], strongVs: ["Sustain"] },
+            { name: "Minotaur", role: "Roam", tier: 8, notes: "Heal & CC.", weakVs: ["Diggie"], strongVs: ["Burst"] },
+            { name: "Novaria", role: "Mid", tier: 8, notes: "Vision & Poke.", weakVs: ["Lolita"], strongVs: ["Squishies"] },
+            { name: "Ixia", role: "Gold", tier: 8, notes: "Teamfight Ult.", weakVs: ["Assassins"], strongVs: ["Grouped Enemies"] },
+            { name: "Bruno", role: "Gold", tier: 8, notes: "Early Crit.", weakVs: ["Blade Armor"], strongVs: ["Squishies"] },
+            { name: "Karrie", role: "Gold", tier: 8, notes: "Tank Killer.", weakVs: ["Long Range"], strongVs: ["Fredrinn", "Baxia", "Barats"] },
+            { name: "Barats", role: "Jungle", tier: 8, notes: "Thick Dino.", weakVs: ["Karrie", "Dyrroth"], strongVs: ["Assassins"] },
+            { name: "Guinevere", role: "Jungle", tier: 8, notes: "Knockup Control.", weakVs: ["Diggie"], strongVs: ["Immobile"] },
+            // B-Tier
+            { name: "Chou", role: "Roam", tier: 7, notes: "Kick Pick-off.", weakVs: ["Minsitthar"], strongVs: ["Lancelot"] },
+            { name: "Khaleed", role: "Exp", tier: 7, notes: "Lane Bully.", weakVs: ["CC Chain"], strongVs: ["Late Scalers"] },
+            { name: "Phoveus", role: "Exp", tier: 7, notes: "Anti-Dash.", weakVs: ["Esmeralda"], strongVs: ["Wanwan", "Benedetta", "Harith"] },
+            { name: "Minsitthar", role: "Exp", tier: 7, notes: "Anti-Dash Field.", weakVs: ["Range"], strongVs: ["Lancelot", "Harith", "Joy"] },
+            { name: "Lapu-Lapu", role: "Exp", tier: 7, notes: "Dive Fighter.", weakVs: ["Esmeralda"], strongVs: ["Backline"] },
+            { name: "Paquito", role: "Jungle", tier: 7, notes: "Burst Fighter.", weakVs: ["CC Chain"], strongVs: ["Squishies"] },
+            { name: "Benedetta", role: "Exp", tier: 7, notes: "Split Push.", weakVs: ["Phoveus", "Minsitthar"], strongVs: ["Skillshots"] },
+            { name: "Wanwan", role: "Gold", tier: 7, notes: "Immunity.", weakVs: ["Phoveus", "Minsitthar"], strongVs: ["Melee"] },
+            { name: "Brody", role: "Gold", tier: 7, notes: "Early Burst.", weakVs: ["Assassins"], strongVs: ["Squishies"] },
+            { name: "Beatrix", role: "Gold", tier: 7, notes: "Versatile.", weakVs: ["Dive"], strongVs: ["Any"] },
+            { name: "Melissa", role: "Gold", tier: 7, notes: "Anti-Melee.", weakVs: ["Mages"], strongVs: ["Fighters"] },
+            { name: "Moskov", role: "Gold", tier: 7, notes: "Late Game Pierce.", weakVs: ["Blade Armor"], strongVs: ["Short Range"] },
+            { name: "Lylia", role: "Mid", tier: 7, notes: "Kiting Mage.", weakVs: ["Long Range"], strongVs: ["Melee"] },
+            { name: "Kadita", role: "Roam", tier: 7, notes: "Instant Burst.", weakVs: ["Tanky"], strongVs: ["Squishies"] },
+            { name: "Khufra", role: "Roam", tier: 7, notes: "Anti-Dash Ball.", weakVs: ["Knockback"], strongVs: ["Fanny", "Lance"] },
+            { name: "Atlas", role: "Roam", tier: 7, notes: "Wombo Combo.", weakVs: ["Diggie", "Valentina"], strongVs: ["Grouped"] },
+            { name: "Lolita", role: "Roam", tier: 7, notes: "Projectile Shield.", weakVs: ["Melee"], strongVs: ["Chang'e", "Kimmy", "Ixia"] },
+            { name: "Akai", role: "Jungle", tier: 7, notes: "Pin Control.", weakVs: ["Diggie"], strongVs: ["Assassins"] },
+            { name: "Martis", role: "Jungle", tier: 7, notes: "Early Game Kill.", weakVs: ["Kiting"], strongVs: ["CC Comps"] },
+            { name: "Fanny", role: "Jungle", tier: 7, notes: "High Skill/Risk.", weakVs: ["Khufra", "Moskov", "Saber"], strongVs: ["No CC"] },
+            { name: "Ling", role: "Jungle", tier: 7, notes: "Wall Walk.", weakVs: ["Minsitthar", "Kaja"], strongVs: ["Backline"] },
+            { name: "Gusion", role: "Jungle", tier: 7, notes: "Magic Burst.", weakVs: ["Athena Shield"], strongVs: ["Squishies"] },
+            { name: "Aamon", role: "Jungle", tier: 7, notes: "Camouflage Burst.", weakVs: ["Radiant Armor"], strongVs: ["Marksmen"] },
+            { name: "Julian", role: "Jungle", tier: 7, notes: "Versatile Magic.", weakVs: ["CC"], strongVs: ["Squishies"] },
+            { name: "Xavier", role: "Mid", tier: 7, notes: "Global Snipe.", weakVs: ["Assassins"], strongVs: ["Grouped"] },
+            { name: "Vexana", role: "Mid", tier: 7, notes: "CC & Lord.", weakVs: ["Assassins"], strongVs: ["Pushing"] },
+            { name: "Nana", role: "Mid", tier: 7, notes: "Annoying CC.", weakVs: ["Long Range"], strongVs: ["Divers"] },
+            { name: "Valir", role: "Mid", tier: 7, notes: "Anti-Engage.", weakVs: ["Long Range"], strongVs: ["Melee Tanks"] },
+            { name: "Cecilion", role: "Mid", tier: 7, notes: "Late Game Stack.", weakVs: ["Early Aggro"], strongVs: ["Late Game"] },
+            { name: "Esmeralda", role: "Exp", tier: 7, notes: "Shield Absorb.", weakVs: ["Dyrroth", "Karrie"], strongVs: ["Phoveus", "Harith"] },
+            { name: "X.Borg", role: "Exp", tier: 7, notes: "True Damage.", weakVs: ["Burst"], strongVs: ["Tanky"] },
+            { name: "Dyrroth", role: "Exp", tier: 7, notes: "Armor Break.", weakVs: ["CC"], strongVs: ["Esmeralda", "Tanks"] },
+            { name: "Alpha", role: "Jungle", tier: 7, notes: "True Dmg Sustain.", weakVs: ["Kiting"], strongVs: ["Melee"] },
+            // C/D Tier
+            { name: "Layla", role: "Gold", tier: 5, notes: "Range but Immobile.", weakVs: ["Everything"], strongVs: ["Nothing touching her"] },
+            { name: "Miya", role: "Gold", tier: 5, notes: "Late Game invisible.", weakVs: ["Early Game"], strongVs: ["Late Game"] },
+            { name: "Hanabi", role: "Gold", tier: 6, notes: "CC Immunity Shield.", weakVs: ["Burst"], strongVs: ["CC Comps"] },
+            { name: "Lesley", role: "Gold", tier: 6, notes: "True Damage Poke.", weakVs: ["Early Game"], strongVs: ["Tanks"] },
+            { name: "Popol and Kupa", role: "Gold", tier: 6, notes: "Push & Trap.", weakVs: ["AoE"], strongVs: ["Single Target"] },
+            { name: "Clint", role: "Gold", tier: 6, notes: "Lane Bully.", weakVs: ["Assassins"], strongVs: ["Short Range"] },
+            { name: "Irithel", role: "Gold", tier: 5, notes: "Move & Shoot.", weakVs: ["Burst"], strongVs: ["Clumped"] },
+            { name: "Granger", role: "Jungle", tier: 6, notes: "Early Snowball.", weakVs: ["Late Game"], strongVs: ["Squishies"] },
+            { name: "Natan", role: "Gold", tier: 6, notes: "Magic DPS.", weakVs: ["Radiant Armor"], strongVs: ["Tanks"] },
+            { name: "Yin", role: "Exp", tier: 5, notes: "Kidnap Ult.", weakVs: ["Purify", "WoN"], strongVs: ["Squishies"] },
+            { name: "Aldous", role: "Exp", tier: 5, notes: "Stacking.", weakVs: ["Early End"], strongVs: ["Late Game"] },
+            { name: "Badang", role: "Exp", tier: 5, notes: "Wall Trap.", weakVs: ["Purify"], strongVs: ["No Dash"] },
+            { name: "Sun", role: "Jungle", tier: 5, notes: "Push & Confusion.", weakVs: ["AoE"], strongVs: ["Single Target"] },
+            { name: "Zilong", role: "Exp", tier: 5, notes: "Split Push.", weakVs: ["CC"], strongVs: ["Towers"] },
+            { name: "Argus", role: "Exp", tier: 5, notes: "Immunity.", weakVs: ["Kiting"], strongVs: ["Manfight"] },
+            { name: "Aulus", role: "Jungle", tier: 5, notes: "Late Scaler.", weakVs: ["Early Invade"], strongVs: ["Clumped"] },
+            { name: "Balmond", role: "Jungle", tier: 6, notes: "Objective Secure.", weakVs: ["Kiting"], strongVs: ["Execute"] },
+            { name: "Saber", role: "Roam", tier: 6, notes: "One Shot.", weakVs: ["Tanky"], strongVs: ["Fanny", "Ling"] },
+            { name: "Helcurt", role: "Roam", tier: 6, notes: "Silence.", weakVs: ["Vision"], strongVs: ["Mages"] },
+            { name: "Natalia", role: "Roam", tier: 6, notes: "Invisible Roam.", weakVs: ["Rafaela", "Yi Sun-shin"], strongVs: ["Marksmen"] },
+            { name: "Selena", role: "Roam", tier: 6, notes: "Stun Arrow.", weakVs: ["Cleanse"], strongVs: ["Vision"] },
+            { name: "Franco", role: "Roam", tier: 6, notes: "Hook.", weakVs: ["Missed Hooks"], strongVs: ["Buff Reset"] },
+            { name: "Tigreal", role: "Roam", tier: 6, notes: "Basic CC.", weakVs: ["Diggie"], strongVs: ["Grouped"] },
+            { name: "Estes", role: "Roam", tier: 6, notes: "Heal Bot.", weakVs: ["Baxia", "Luo Yi"], strongVs: ["Sustain"] },
+            { name: "Rafaela", role: "Roam", tier: 6, notes: "Speed & Heal.", weakVs: ["Burst"], strongVs: ["Slows"] },
+            { name: "Floryn", role: "Roam", tier: 6, notes: "Global Heal.", weakVs: ["Assassins"], strongVs: ["Poke"] },
+            { name: "Johnson", role: "Roam", tier: 5, notes: "Car Crash.", weakVs: ["Map Awareness"], strongVs: ["Surprise"] },
+            { name: "Gloo", role: "Exp", tier: 6, notes: "Sticky.", weakVs: ["Faramis", "Vexana"], strongVs: ["Single Target"] },
+            { name: "Belerick", role: "Roam", tier: 6, notes: "Anti-DPS.", weakVs: ["Gusion"], strongVs: ["Attack Speed"] },
+            { name: "Hylos", role: "Roam", tier: 6, notes: "Meat Shield.", weakVs: ["Karrie"], strongVs: ["Immobile"] },
+            { name: "Gord", role: "Mid", tier: 5, notes: "True Dmg Laser.", weakVs: ["Assassins"], strongVs: ["Tanks"] },
+            { name: "Eudora", role: "Mid", tier: 5, notes: "Bush Camp.", weakVs: ["Vision"], strongVs: ["Squishies"] },
+            { name: "Vale", role: "Mid", tier: 6, notes: "Knockup Combo.", weakVs: ["Assassins"], strongVs: ["Grouped"] },
+            { name: "Cyclops", role: "Jungle", tier: 6, notes: "Mage DPS.", weakVs: ["Burst"], strongVs: ["Melee"] },
+            { name: "Harith", role: "Gold", tier: 7, notes: "Dash Mage.", weakVs: ["Minsitthar", "Esmeralda"], strongVs: ["Melee"] },
+            { name: "Chang'e", role: "Mid", tier: 6, notes: "Machine Gun.", weakVs: ["Lolita", "Radiant"], strongVs: ["Pushing"] },
+            { name: "Odette", role: "Mid", tier: 6, notes: "AoE Ult.", weakVs: ["CC"], strongVs: ["Johnson Combo"] },
+            { name: "Pharsa", role: "Mid", tier: 6, notes: "Artillery.", weakVs: ["Divers"], strongVs: ["Zoning"] },
+            { name: "Zhask", role: "Mid", tier: 6, notes: "Turret Spawn.", weakVs: ["Retribution"], strongVs: ["Pushing"] },
+            { name: "Alice", role: "Jungle", tier: 6, notes: "Late Sustain.", weakVs: ["Anti-Heal"], strongVs: ["Late Game"] },
+            { name: "Lunox", role: "Jungle", tier: 7, notes: "Tank Melt.", weakVs: ["CC"], strongVs: ["Tanks"] },
+            { name: "Kagura", role: "Mid", tier: 6, notes: "Umbrella.", weakVs: ["High Mobility"], strongVs: ["Squishies"] },
+            { name: "Aurora", role: "Mid", tier: 6, notes: "Freeze.", weakVs: ["Assassins"], strongVs: ["Engage"] },
+            { name: "Harley", role: "Jungle", tier: 6, notes: "Ring Trick.", weakVs: ["Radiant Armor"], strongVs: ["Squishies"] },
+            { name: "Silvanna", role: "Roam", tier: 6, notes: "Trap.", weakVs: ["Purify"], strongVs: ["Immobile"] },
+            { name: "Jawhead", role: "Exp", tier: 6, notes: "Throw.", weakVs: ["Kiting"], strongVs: ["Squishies"] },
+            { name: "Thamuz", role: "Jungle", tier: 6, notes: "Sustain Scythes.", weakVs: ["Kiting"], strongVs: ["Melee"] },
+            { name: "Leomord", role: "Jungle", tier: 6, notes: "Crit Horse.", weakVs: ["CC"], strongVs: ["Low HP"] },
+            { name: "Alucard", role: "Jungle", tier: 5, notes: "Lifesteal.", weakVs: ["CC"], strongVs: ["No CC"] },
+            { name: "Bane", role: "Jungle", tier: 5, notes: "Splash Dmg.", weakVs: ["Burst"], strongVs: ["Pushing"] },
+            { name: "Freya", role: "Jungle", tier: 6, notes: "Shield Bash.", weakVs: ["Kiting"], strongVs: ["Melee"] },
+            { name: "Masha", role: "Roam", tier: 6, notes: "HP Bars.", weakVs: ["Kiting"], strongVs: ["One Shot"] },
+            { name: "Hilda", role: "Roam", tier: 6, notes: "Bush Regen.", weakVs: ["CC"], strongVs: ["Invade"] },
+            { name: "Uranus", role: "Exp", tier: 6, notes: "Regen Tank.", weakVs: ["Anti-Heal", "Esmeralda"], strongVs: ["Distraction"] },
+            { name: "Chip", role: "Roam", tier: 8, notes: "Portal Rotation.", weakVs: ["Coordination"], strongVs: ["Ganks"] },
+            { name: "Suyou", role: "Jungle", tier: 8, notes: "New Assassin.", weakVs: ["Hard CC"], strongVs: ["Squishies"] },
+            { name: "Hanzo", role: "Jungle", tier: 5, notes: "Ghost.", weakVs: ["Natalia", "Ling"], strongVs: ["Backline"] },
+            { name: "Carmilla", role: "Roam", tier: 6, notes: "Linked DMG.", weakVs: ["Diggie"], strongVs: ["Grouped"] }
+        ];
+
         window.addEventListener('DOMContentLoaded', () => {
-            
+            // --- CHART JS LOGIC ---
             const chartInstances = {};
+            const contestedData = { labels: ['Nolan', 'Mathilda', 'Diggie', 'Joy', 'Luo Yi'], values: [155, 142, 125, 115, 109] };
+            const winRateData = { labels: ['Kaja', 'Luo Yi', 'Khaleed', 'Baxia', 'Claude'], values: [71.4, 66.7, 63.6, 63.2, 62.9] };
 
-            // --- DATA SETS ---
-            
-            // 1. Volume Stats (Old Report)
-            const contestedData = {
-                labels: ['Nolan', 'Mathilda', 'Diggie', 'Joy', 'Luo Yi'],
-                values: [155, 142, 125, 115, 109]
-            };
-            const winRateData = {
-                labels: ['Kaja', 'Luo Yi', 'Khaleed', 'Baxia', 'Claude'],
-                values: [71.4, 66.7, 63.6, 63.2, 62.9]
+            // --- DRAFTER STATE ---
+            let drafterState = {
+                myBans: [null, null, null, null, null],
+                enemyBans: [null, null, null, null, null],
+                myTeam: [null, null, null, null, null],
+                enemyTeam: [null, null, null, null, null],
+                activeSlot: { type: null, index: null }
             };
 
-            // Tab Navigation
+            // --- TAB NAVIGATION ---
             const buttons = document.querySelectorAll('.nav-button');
             const contents = document.querySelectorAll('main section');
 
@@ -447,77 +441,139 @@
                     button.classList.add('active');
                     contents.forEach(c => c.classList.add('hidden'));
                     document.getElementById(targetId).classList.remove('hidden');
-                    
-                    // Trigger charts if on Landscape tab
-                    if (targetId === 'content-landscape') {
-                        setTimeout(initCharts, 50);
-                    }
+                    if (targetId === 'content-landscape') setTimeout(initCharts, 50);
                 });
             });
 
-            // Chart Rendering
+            // --- CHART FUNCTIONS ---
             function createChart(ctx, type, labels, data, color, isPercent = false) {
                 const chartId = ctx.canvas.id;
                 if (chartInstances[chartId]) chartInstances[chartId].destroy();
-
                 const ops = {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    indexAxis: 'y',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#1c1917',
-                            titleFont: { weight: 'bold' },
-                            callbacks: { 
-                                label: (c) => isPercent ? `${c.raw}%` : `${c.raw}`
-                            }
-                        }
-                    },
-                    scales: {
-                        x: { 
-                            grid: { color: '#e7e5e4' }, 
-                            beginAtZero: true,
-                            ticks: {
-                                callback: (v) => isPercent ? v + '%' : v
-                            }
-                        },
-                        y: { 
-                            grid: { display: false }, 
-                            ticks: { font: { weight: '600' }, color: '#44403c' } 
-                        }
-                    }
+                    responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+                    plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1c1917', titleFont: { weight: 'bold' }, callbacks: { label: (c) => isPercent ? `${c.raw}%` : `${c.raw}` } } },
+                    scales: { x: { grid: { color: '#e7e5e4' }, beginAtZero: true, ticks: { callback: (v) => isPercent ? v + '%' : v } }, y: { grid: { display: false }, ticks: { font: { weight: '600' }, color: '#44403c' } } }
                 };
-
-                if (isPercent) {
-                    ops.scales.x.max = 100;
-                }
-
-                chartInstances[chartId] = new Chart(ctx, {
-                    type: type,
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: data,
-                            backgroundColor: color,
-                            borderRadius: 4,
-                            barThickness: 20
-                        }]
-                    },
-                    options: ops
-                });
+                if (isPercent) ops.scales.x.max = 100;
+                chartInstances[chartId] = new Chart(ctx, { type: type, data: { labels: labels, datasets: [{ data: data, backgroundColor: color, borderRadius: 4, barThickness: 20 }] }, options: ops });
             }
-
             function initCharts() {
                 const ctx1 = document.getElementById('contestedChart')?.getContext('2d');
                 if (ctx1) createChart(ctx1, 'bar', contestedData.labels, contestedData.values, '#0284c7');
-
                 const ctx2 = document.getElementById('winRateChart')?.getContext('2d');
                 if (ctx2) createChart(ctx2, 'bar', winRateData.labels, winRateData.values, '#059669', true);
             }
 
-            // Initial Load
+            // --- DRAFTER FUNCTIONS ---
+            window.renderSlots = function() {
+                document.getElementById('my-bans-container').innerHTML = drafterState.myBans.map((hero, index) => renderBanSlot(hero, index, 'myBans')).join('');
+                document.getElementById('enemy-bans-container').innerHTML = drafterState.enemyBans.map((hero, index) => renderBanSlot(hero, index, 'enemyBans')).join('');
+                document.getElementById('my-team-container').innerHTML = drafterState.myTeam.map((hero, index) => renderTeamSlot(hero, index, 'myTeam')).join('');
+                document.getElementById('enemy-team-container').innerHTML = drafterState.enemyTeam.map((hero, index) => renderTeamSlot(hero, index, 'enemyTeam')).join('');
+                calculateRecommendations();
+            }
+
+            function renderBanSlot(hero, index, type) {
+                return `<div onclick="openModal('${type}', ${index})" class="aspect-square rounded border border-slate-700 bg-slate-900/50 flex items-center justify-center cursor-pointer hover:border-red-500/50 transition relative overflow-hidden group">${hero ? `<div class="absolute inset-0 bg-slate-800 flex flex-col items-center justify-center p-1"><span class="text-[9px] leading-none font-bold text-slate-400 text-center break-all">${hero.name}</span></div><div class="absolute inset-0 bg-red-500/10 group-hover:bg-red-500/20 pointer-events-none"></div><button onclick="clearSlot(event, '${type}', ${index})" class="absolute top-0 right-0 bg-black/60 text-red-400 hover:text-red-200 w-4 h-4 flex items-center justify-center text-[10px] rounded-bl">x</button>` : `<i class="fas fa-ban text-slate-700 text-xs opacity-50"></i>`}</div>`;
+            }
+
+            function renderTeamSlot(hero, index, type) {
+                const isMyTeam = type === 'myTeam';
+                const borderColor = isMyTeam ? 'border-sky-700/50 hover:border-sky-400' : 'border-red-700/50 hover:border-red-400';
+                const bgColor = isMyTeam ? 'bg-sky-900/10' : 'bg-red-900/10';
+                const emptyIcon = isMyTeam ? 'fa-plus' : 'fa-user-secret';
+                const emptyText = isMyTeam ? 'Pick Hero' : 'Enemy Pick';
+                if (hero) {
+                    return `<div class="flex items-center gap-3 p-2 rounded border ${isMyTeam ? 'border-sky-600 bg-sky-900/30' : 'border-red-600 bg-red-900/30'} relative group animate-fade-in shadow-md"><div class="w-10 h-10 rounded bg-slate-800 flex items-center justify-center font-bold text-xs text-slate-300 border border-slate-600 overflow-hidden shrink-0">${hero.name.substring(0, 2)}</div><div class="flex-grow min-w-0"><div class="font-bold text-sm text-white leading-none truncate">${hero.name}</div><div class="mt-1"><span class="role-badge role-${hero.role.toLowerCase()}">${hero.role}</span></div></div><button onclick="clearSlot(event, '${type}', ${index})" class="text-slate-500 hover:text-white px-2 transition"><i class="fas fa-times"></i></button></div>`;
+                } else {
+                    return `<div onclick="openModal('${type}', ${index})" class="flex items-center gap-3 p-2 rounded border border-dashed ${borderColor} ${bgColor} cursor-pointer transition h-[58px] hover:shadow-lg opacity-80 hover:opacity-100"><div class="w-8 h-8 rounded-full bg-slate-800/50 flex items-center justify-center text-slate-500"><i class="fas ${emptyIcon} text-xs"></i></div><div class="text-xs font-bold text-slate-500 uppercase tracking-wider">${emptyText}</div></div>`;
+                }
+            }
+
+            function calculateRecommendations() {
+                const list = document.getElementById('recommendation-list');
+                const myRoles = drafterState.myTeam.filter(h => h).map(h => h.role);
+                const takenHeroes = [...drafterState.myBans, ...drafterState.enemyBans, ...drafterState.myTeam, ...drafterState.enemyTeam].filter(h => h).map(h => h.name);
+                let available = heroDatabase.filter(h => !takenHeroes.includes(h.name));
+
+                if (drafterState.enemyTeam.filter(h=>h).length === 0 && drafterState.myTeam.filter(h=>h).length === 0) {
+                     list.innerHTML = `<div class="flex flex-col items-center justify-center h-48 text-slate-600"><i class="fas fa-chess-board text-5xl mb-3 opacity-20 animate-pulse"></i><p class="text-sm font-medium">Draft Board Empty</p><p class="text-xs mt-1">Input bans or picks to start analysis.</p></div><div class="p-3 rounded-lg bg-emerald-900/20 border border-emerald-700/30 animate-fade-in"><h4 class="font-bold text-emerald-400 text-xs uppercase mb-2"><i class="fas fa-globe-asia mr-1"></i> Current Meta (S16)</h4><div class="grid grid-cols-2 gap-2 text-xs"><div class="bg-black/20 p-2 rounded"><span class="text-sky-300 font-bold">Zhuxin</span><br><span class="text-slate-400">Mid Lane God</span></div><div class="bg-black/20 p-2 rounded"><span class="text-sky-300 font-bold">Nolan</span><br><span class="text-slate-400">Fast Jungle</span></div><div class="bg-black/20 p-2 rounded"><span class="text-sky-300 font-bold">Diggie</span><br><span class="text-slate-400">Roam Priority</span></div><div class="bg-black/20 p-2 rounded"><span class="text-sky-300 font-bold">Claude</span><br><span class="text-slate-400">Gold Standard</span></div></div></div>`;
+                     return;
+                }
+
+                const scores = available.map(hero => {
+                    let score = hero.tier * 10;
+                    let reasons = [];
+                    if (myRoles.includes(hero.role) && hero.role !== 'Flex') score -= 150;
+                    drafterState.enemyTeam.filter(h => h).forEach(enemy => {
+                        if (hero.strongVs && hero.strongVs.includes(enemy.name)) { score += 25; reasons.push(`Counters <span class="text-red-400 font-bold">${enemy.name}</span>`); }
+                        if (enemy.name === 'Lancelot' && ['Khufra', 'Phoveus', 'Minsitthar'].includes(hero.name)) { score += 20; reasons.push("Anti-Dash"); }
+                        if (enemy.name === 'Fanny' && ['Khufra', 'Saber', 'Franco'].includes(hero.name)) { score += 25; reasons.push("Hard Stop"); }
+                    });
+                    drafterState.myTeam.filter(h => h).forEach(ally => {
+                         if (hero.synergies && hero.synergies.includes(ally.name)) { score += 15; reasons.push(`Synergy: <span class="text-sky-400 font-bold">${ally.name}</span>`); }
+                    });
+                    return { ...hero, score, reasons };
+                });
+
+                scores.sort((a, b) => b.score - a.score);
+                const topPicks = scores.slice(0, 8);
+                if(topPicks.length === 0) { list.innerHTML = '<div class="text-center text-slate-500 p-4">Draft complete or no suggestions.</div>'; return; }
+
+                list.innerHTML = topPicks.map(hero => {
+                    const isSynergy = hero.reasons.some(r => r.includes('Synergy'));
+                    const isCounter = hero.reasons.some(r => r.includes('Counter') || r.includes('Anti') || r.includes('Stop'));
+                    let borderClass = 'border-slate-800', bgClass = 'bg-slate-900/50', scoreColor = 'text-slate-500';
+                    if (isCounter) { borderClass = 'border-emerald-500/60'; bgClass = 'bg-emerald-900/20'; scoreColor = 'text-emerald-400'; }
+                    else if (isSynergy) { borderClass = 'border-blue-500/60'; bgClass = 'bg-blue-900/20'; scoreColor = 'text-blue-400'; }
+                    else if (hero.score >= 90) { borderClass = 'border-purple-500/60'; bgClass = 'bg-purple-900/20'; scoreColor = 'text-purple-400'; }
+                    return `<div class="p-3 rounded-lg border ${borderClass} ${bgClass} hover:bg-slate-800 transition animate-fade-in flex justify-between gap-3 shadow-sm"><div class="flex-grow min-w-0"><div class="flex items-center gap-2 mb-1"><span class="font-bold text-white text-base truncate">${hero.name}</span><span class="role-badge role-${hero.role.toLowerCase()}">${hero.role}</span></div>${hero.reasons.length > 0 ? `<div class="text-[11px] text-slate-300 leading-tight truncate"><i class="fas fa-check mr-1 text-green-500"></i>${hero.reasons.join(', ')}</div>` : `<div class="text-[11px] text-slate-500 italic leading-tight truncate">${hero.notes}</div>`}</div><div class="flex flex-col items-center justify-center min-w-[30px]"><span class="font-bold text-lg ${scoreColor}">${hero.score}</span></div></div>`;
+                }).join('');
+            }
+
+            window.openModal = function(type, index) {
+                drafterState.activeSlot = { type, index };
+                const isBan = type.includes('Bans');
+                const title = document.getElementById('modal-title');
+                title.innerText = isBan ? `Select Hero to BAN` : `Select Hero to PICK`;
+                title.className = isBan ? "font-bold text-red-400 text-lg" : "font-bold text-sky-400 text-lg";
+                document.getElementById('hero-modal').classList.remove('hidden');
+                const search = document.getElementById('hero-search');
+                search.value = ''; search.focus();
+                filterHeroes('All');
+            }
+            window.closeModal = function() { document.getElementById('hero-modal').classList.add('hidden'); }
+            window.filterHeroes = function(role) {
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    if (b.innerText === role) { b.classList.remove('bg-slate-800', 'border-slate-700'); b.classList.add('bg-white', 'text-slate-900', 'border-white'); }
+                    else { b.classList.add('bg-slate-800', 'border-slate-700'); b.classList.remove('bg-white', 'text-slate-900', 'border-white'); }
+                });
+                const search = document.getElementById('hero-search').value.toLowerCase();
+                const grid = document.getElementById('hero-grid');
+                const taken = [...drafterState.myBans, ...drafterState.enemyBans, ...drafterState.myTeam, ...drafterState.enemyTeam].filter(x=>x).map(x=>x.name);
+                const filtered = heroDatabase.filter(h => {
+                    const matchRole = role === 'All' || h.role === role;
+                    const matchName = h.name.toLowerCase().includes(search);
+                    return matchRole && matchName && !taken.includes(h.name);
+                });
+                grid.innerHTML = filtered.map(h => `<button onclick="selectHero('${h.name}')" class="flex flex-col items-center p-2 rounded hover:bg-slate-800 border border-transparent hover:border-slate-700 transition group"><div class="w-10 h-10 bg-slate-800 rounded flex items-center justify-center text-xs font-bold text-slate-400 group-hover:text-white group-hover:bg-slate-700 mb-1 border border-slate-700 group-hover:border-slate-500 shrink-0">${h.name.substring(0,2)}</div><span class="text-[10px] text-slate-400 group-hover:text-white font-medium text-center leading-tight w-full truncate">${h.name}</span></button>`).join('');
+            }
+            window.selectHero = function(name) {
+                const hero = heroDatabase.find(h => h.name === name);
+                const { type, index } = drafterState.activeSlot;
+                drafterState[type][index] = hero;
+                closeModal(); renderSlots();
+            }
+            window.clearSlot = function(e, type, index) { e.stopPropagation(); drafterState[type][index] = null; renderSlots(); }
+            window.resetDraft = function() {
+                drafterState = { myBans: [null,null,null,null,null], enemyBans: [null,null,null,null,null], myTeam: [null,null,null,null,null], enemyTeam: [null,null,null,null,null], activeSlot: { type: null, index: null } };
+                renderSlots();
+            }
+            document.getElementById('hero-search').addEventListener('input', () => { const activeBtn = document.querySelector('.filter-btn.bg-white'); filterHeroes(activeBtn ? activeBtn.innerText : 'All'); });
+
+            // Initialize
             initCharts();
+            renderSlots();
         });
     </script>
 </body>
