@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPL ID S16 Meta Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Warm Neutrals (bg-stone-50, text-stone-900, accent-sky-600) -->
+    <!-- Application Structure Plan: Designed a 3-tab SPA structure ('Meta Overview', 'Hero Deep Dive', 'Lineup Analysis') to directly address the user's analytical questions. 'Overview' provides high-level stats (picks/bans) via charts. 'Deep Dive' categorizes heroes qualitatively ('Power Picks', 'Priority Bans') to explain *why* they are strong. 'Lineup Analysis' synthesizes this data to answer the user's specific query about 'best lineups' and 'counters' by presenting meta archetypes and explanations. This structure guides the user from raw data to strategic insight, prioritizing usability and direct answers over mirroring the source's flat table structure. -->
+    <!-- Visualization & Content Choices: 
+        Report Info: Tournament Stats -> Goal: Inform -> Method: HTML/Tailwind KPI Cards -> Interaction: None -> Justification: High-level summary.
+        Report Info: Top Picks, Bans, Contested, WR -> Goal: Compare -> Method: Chart.js Bar Charts (in constrained containers) -> Interaction: Tooltip on hover -> Justification: Clear visual comparison of key hero stats.
+        Report Info: Hero Roles in Meta -> Goal: Organize -> Method: HTML/Tailwind card layout ('Power Picks', 'Priority Bans') -> Interaction: None -> Justification: Qualitative grouping of heroes by meta role.
+        Report Info: 'Best' Lineups & Counters -> Goal: Inform (Analysis) -> Method: Structured HTML/Tailwind text sections & cards -> Interaction: None -> Justification: Directly answers user's analytical question with a textual report.
+        Library/Method: Chart.js (Canvas) for all charts. HTML/Tailwind for layout, cards, and text. Vanilla JS for tab navigation (show/hide sections). CONFIRMS NO SVG/Mermaid. This supports the 3-tab application structure. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+            border: 2px solid transparent;
+            background-color: #e7e5e4;
+            color: #44403c;
+        }
+        .nav-button:hover {
+            background-color: #d6d3d1;
+        }
+        .nav-button.active {
+            background-color: #0284c7;
+            color: white;
+            border-color: #0369a1;
+        }
+        .kpi-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .kpi-value {
+            font-size: 2.25rem;
+            line-height: 2.5rem;
+            font-weight: 700;
+            color: #0284c7;
+        }
+        .kpi-label {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            color: #57534e;
+            margin-top: 0.25rem;
+        }
+        .content-card {
+             background-color: white;
+             border-radius: 0.75rem;
+             padding: 1.5rem;
+             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+             height: 100%;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-900 min-h-screen">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-stone-800 mb-2">MPL ID Season 16 Meta Report</h1>
+            <p class="text-lg text-stone-600">An interactive analysis of hero picks, bans, and team strategies.</p>
+        </header>
+
+        <nav class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
+            <button id="btn-overview" class="nav-button active">Meta Overview</button>
+            <button id="btn-deepdive" class="nav-button">Hero Deep Dive</button>
+            <button id="btn-lineups" class="nav-button">Lineup Analysis</button>
+        </nav>
+
+        <main>
+            <section id="content-overview" class="space-y-8">
+                <p class="text-lg text-stone-700 max-w-3xl mx-auto text-center">
+                    This section provides a high-level statistical overview of the MPL ID Season 16 meta. It covers the most prioritized heroes, overall hero diversity, and which heroes performed best. All data is based on the 172 games played during the season.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                    <div class="kpi-card">
+                        <div class="kpi-value">172</div>
+                        <div class="kpi-label">Total Games Played</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">93</div>
+                        <div class="kpi-label">Unique Heroes Picked</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">31</div>
+                        <div class="kpi-label">Uncontested Heroes</div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h2 class="text-xl font-bold text-center mb-4">Most Contested Heroes (Picks + Bans)</h2>
+                    <p class="text-center text-stone-600 mb-4 text-sm max-w-2xl mx-auto">These heroes were the most prioritized, appearing in either the pick or ban phase in the highest number of games. They define the S16 meta.</p>
+                    <div class="chart-container">
+                        <canvas id="contestedChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="content-card">
+                        <h2 class="text-xl font-bold text-center mb-4">Top 5 Most Picked</h2>
+                        <div class="chart-container">
+                            <canvas id="pickedChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <h2 class="text-xl font-bold text-center mb-4">Top 5 Most Banned</h2>
+                        <div class="chart-container">
+                            <canvas id="bannedChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h2 class="text-xl font-bold text-center mb-4">Highest Win Rate (Min. 10 Games)</h2>
+                    <p class="text-center text-stone-600 mb-4 text-sm max-w-2xl mx-auto">These heroes showed the most success when they made it through the draft, indicating strong performance in the hands of pro players.</p>
+                    <div class="chart-container">
+                        <canvas id="winRateChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="content-deepdive" class="space-y-8 hidden">
+                <p class="text-lg text-stone-700 max-w-3xl mx-auto text-center">
+                    Beyond the raw numbers, heroes fit into specific roles within the meta. This section breaks down the top heroes into qualitative categories to explain *why* they were so dominant or prioritized.
+                </p>
+
+                <div>
+                    <h3 class="text-2xl font-bold text-stone-800 mb-3 text-center">The Power Picks</h3>
+                    <p class="text-center text-stone-600 mb-6 max-w-2xl mx-auto">Heroes with both a high pick rate and a high win rate. These are reliable, strong, and consistent choices that formed the core of many team compositions.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="content-card">
+                            <h4 class="text-lg font-bold text-sky-700 mb-2">Claude (Gold Lane)</h4>
+                            <p class="text-sm text-stone-700">With a 62.9% WR over 62 games, Claude was the premier marksman. His high mobility with Battle Mirror Image and massive teamfight damage from Blazing Duet made him a late-game monster that was difficult to lock down.</p>
+                        </div>
+                        <div class="content-card">
+                            <h4 class="text-lg font-bold text-sky-700 mb-2">Baxia (Jungle)</h4>
+                            <p class="text-sm text-stone-700">A 63.2% WR in 38 games. Baxia's value came from his fast rotations with Baxia-Shield Unity, durable nature, and built-in anti-heal from his passive. He excelled at disrupting the enemy backline and controlling objectives.</p>
+                        </div>
+                        <div class="content-card">
+                            <h4 class="text-lg font-bold text-sky-700 mb-2">Nolan (Jungle)</h4>
+                            <p class="text-sm text-stone-700">The most picked hero (88 games) with a solid 54.5% WR. Nolan's exceptional mobility, fast jungle clear, and high burst damage made him the default assassin. He could get in, eliminate a target, and get out with ease.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold text-stone-800 mb-3 text-center">The Priority Bans</h3>
+                    <p class="text-center text-stone-600 mb-6 max-w-2xl mx-auto">Heroes with overwhelmingly high ban rates. Teams would rather not deal with these heroes at all, as they enable strategies that are difficult to counter or are simply overpowered.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="content-card">
+                            <h4 class="text-lg font-bold text-red-700 mb-2">Diggie (Roam)</h4>
+                            <p class="text-sm text-stone-700">Banned 102 times. Diggie's Time Journey (Ultimate) provides a team-wide purify and shield, completely nullifying crowd-control-heavy compositions (like those with Kaja, Arlott, or Luo Yi). He is the ultimate "fun-killer" for dive teams.</p>
+                        </div>
+                        <div class="content-card">
+                            <h4 class="text-lg font-bold text-red-700 mb-2">Joy (Jungle/EXP)</h4>
+                            <p class="text-sm text-stone-700">Banned 85 times. Joy's high mobility, CC immunity during her ultimate, and strong burst damage make her an extremely slippery and dangerous target. She can disrupt formations and pick off backliners with little counterplay.</p>
+                        </div>
+                        <div class="content-card">
+                            <h4 class="text-lg font-bold text-red-700 mb-2">Mathilda (Roam)</h4>
+                            <p class="text-sm text-stone-700">Banned 77 times and picked 65 times (2nd most contested). Her ability to grant allies a free "flicker" with Guiding Wind enables incredible team mobility, ganks, and escapes. Her ultimate also provides a reliable lock-down.</p>
+                        </div>
+                    </div>
+                </div>
+                 
+                <div>
+                    <h3 class="text-2xl font-bold text-stone-800 mb-3 text-center">The Situational Aces</h3>
+                    <p class="text-center text-stone-600 mb-6 max-w-2xl mx-auto">Heroes with staggering win rates but lower pick rates. They weren't picked every game, but when they were (likely in specific "counter" situations), they dominated.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="content-card">
+                            <h4 class="text-lg font-bold text-emerald-700 mb-2">Kaja (Roam/EXP)</h4>
+                            <p class="text-sm text-stone-700">A massive 71.4% WR over 14 games. Kaja's Divine Judgment is the ultimate pick-off tool, a suppression that pulls an enemy out of position. He is the perfect counter to high-mobility heroes (like Nolan, Joy, Claude) that lack a purify.</p>
+                        </div>
+                        <div class="content-card">
+                            <h4 class="text-lg font-bold text-emerald-700 mb-2">Luo Yi (Mid)</h4>
+                            <p class="text-sm text-stone-700">A 66.7% WR over 36 games (and 73 bans). Luo Yi provides huge AoE magic damage and CC. Her ultimate, Diversion, allows for instant team-wide rotations, creating ganks and objective pressures out of nowhere.</p>
+                        </div>
+                        <div class="content-card">
+                            <h4 class="text-lg font-bold text-emerald-700 mb-2">Khaleed (EXP Lane)</h4>
+                            <p class="text-sm text-stone-700">A 63.6% WR over 11 games. A lane bully with incredible sustain, Khaleed can dominate the early game. His ultimate provides a great engagement tool, and he thrives in extended fights where his self-heal shines.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="content-lineups" class="space-y-8 hidden">
+                <p class="text-lg text-stone-700 max-w-3xl mx-auto text-center">
+                    This section synthesizes the statistical and qualitative data to answer the big questions: what is the "best" lineup, and what strategies can be used to counter the meta?
+                </p>
+
+                <div class="content-card">
+                    <h3 class="text-2xl font-bold text-stone-800 mb-3 text-center">The S16 "Meta Standard" Lineup</h3>
+                    <p class="text-center text-stone-600 mb-6 max-w-2xl mx-auto">This hypothetical lineup combines the most contested, reliable, and high-performing heroes of the season. It represents the "default" power composition that teams aimed for.</p>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <div class="kpi-card !bg-sky-50 !shadow-lg border-2 border-sky-200">
+                            <div class="kpi-label !font-bold">JUNGLE</div>
+                            <div class="kpi-value !text-sky-700 !text-2xl">Nolan</div>
+                            <p class="text-xs text-stone-600 mt-2">High mobility, fast clear, high burst. The meta-defining assassin.</p>
+                        </div>
+                        <div class="kpi-card !bg-sky-50 !shadow-lg border-2 border-sky-200">
+                            <div class="kpi-label !font-bold">GOLD LANE</div>
+                            <div class="kpi-value !text-sky-700 !text-2xl">Claude</div>
+                            <p class="text-xs text-stone-600 mt-2">High mobility, great teamfight, and strong late-game scaling.</p>
+                        </div>
+                        <div class="kpi-card !bg-sky-50 !shadow-lg border-2 border-sky-200">
+                            <div class="kpi-label !font-bold">MID LANE</div>
+                            <div class="kpi-value !text-sky-700 !text-2xl">Luo Yi</div>
+                            <p class="text-xs text-stone-600 mt-2">High AoE damage, CC, and global rotation potential with ultimate.</p>
+                        </div>
+                        <div class="kpi-card !bg-sky-50 !shadow-lg border-2 border-sky-200">
+                            <div class="kpi-label !font-bold">EXP LANE</div>
+                            <div class="kpi-value !text-sky-700 !text-2xl">Arlott</div>
+                            <p class="text-xs text-stone-600 mt-2">High pick rate, strong CC, good durability, and great set-up potential.</p>
+                        </div>
+                        <div class="kpi-card !bg-sky-50 !shadow-lg border-2 border-sky-200">
+                            <div class="kpi-label !font-bold">ROAM</div>
+                            <div class="kpi-value !text-sky-700 !text-2xl">Mathilda</div>
+                            <p class="text-xs text-stone-600 mt-2">Top-tier mobility for the team, lock-down, and good poke damage.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold text-stone-800 mb-3 text-center">Meta Counter Strategies</h3>
+                    <p class="text-center text-stone-600 mb-6 max-w-2xl mx-auto">No lineup is unbeatable. Here are the common strategies and hero archetypes used to counter the "Meta Standard" composition.</p>
+                    <div class="space-y-6">
+                        <div class="content-card">
+                            <h4 class="text-xl font-bold text-red-700 mb-2">Strategy 1: The "Anti-Dive" / "Purify" Comp</h4>
+                            <p class="text-stone-700 mb-3"><strong>Goal:</strong> To survive the burst and CC from heroes like Nolan, Arlott, and Mathilda.</p>
+                            <p class="text-stone-700 mb-3"><strong>How it works:</strong> This lineup is built around negating the enemy's engagement. By picking a team-wide purify, you render their entire "all-in" strategy useless, leaving them overextended and vulnerable.</p>
+                            <p class="text-sm"><strong>Core Heroes:</strong> 
+                                <span class="font-medium bg-red-100 text-red-800 px-2 py-1 rounded">Diggie (Roam)</span>,
+                                <span class="font-medium bg-gray-100 text-gray-800 px-2 py-1 rounded">Minotaur (Roam)</span>
+                            </p>
+                        </div>
+                        <div class="content-card">
+                            <h4 class="text-xl font-bold text-emerald-700 mb-2">Strategy 2: The "Pick-Off" Comp</h4>
+                            <p class="text-stone-700 mb-3"><strong>Goal:</strong> To punish the high-mobility meta heroes (Nolan, Claude) who often rely on dashes instead of Purify.</p>
+                            <p class="text-stone-700 mb-3"><strong>How it works:</strong> This strategy uses hard, single-target suppression CC to catch a key target out of position. One successful pick-off on the enemy jungler or marksman can lead to a free Lord or a won teamfight.</p>
+                            <p class="text-sm"><strong>Core Heroes:</strong> 
+                                <span class="font-medium bg-emerald-100 text-emerald-800 px-2 py-1 rounded">Kaja (Roam/EXP)</span>,
+                                <span class="font-medium bg-gray-100 text-gray-800 px-2 py-1 rounded">Franco (Roam)</span>
+                            </p>
+                        </div>
+                        <div class="content-card">
+                            <h4 class="text-xl font-bold text-blue-700 mb-2">Strategy 3: The "Front-to-Back" Tank</h4>
+                            <p class="text-stone-700 mb-3"><strong>Goal:</strong> To out-sustain the enemy burst and win extended teamfights.</p>
+                            <p class="text-stone-700 mb-3"><strong>How it works:</strong> Instead of trying to match the enemy's mobility, this lineup focuses on durability and sustained damage. A tanky jungler and EXP laner can absorb the initial burst and then turn the fight, grinding the enemy down. This works well against assassin-heavy teams.</p>
+                            <p class="text-sm"><strong>Core Heroes:</strong> 
+                                <span class="font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded">Baxia (Jungle)</span>,
+                                <span class="font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded">Khaleed (EXP)</span>,
+                                <span class="font-medium bg-gray-100 text-gray-800 px-2 py-1 rounded">Fredrinn (Jungle/EXP)</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            
+            // --- FIXED: Use a dedicated object for chart instances instead of window global ---
+            const chartInstances = {};
+
+            const contestedData = {
+                labels: ['Nolan', 'Mathilda', 'Diggie', 'Joy', 'Luo Yi'],
+                values: [155, 142, 125, 115, 109]
+            };
+
+            const pickedData = {
+                labels: ['Nolan', 'Martis', 'Mathilda', 'Claude', 'Arlott'],
+                values: [88, 68, 65, 62, 57]
+            };
+            
+            const bannedData = {
+                labels: ['Diggie', 'Joy', 'Mathilda', 'Luo Yi', 'Nolan'],
+                values: [102, 85, 77, 73, 67]
+            };
+
+            const winRateData = {
+                labels: ['Kaja (14g)', 'Luo Yi (36g)', 'Khaleed (11g)', 'Baxia (38g)', 'Claude (62g)'],
+                values: [71.4, 66.7, 63.6, 63.2, 62.9]
+            };
+
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#0284c7',
+                        titleFont: { weight: 'bold' },
+                        bodyFont: { weight: 'bold' },
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.x !== null) {
+                                    label += context.parsed.x;
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#e7e5e4'
+                        },
+                        ticks: {
+                            color: '#57534e'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#1c1917',
+                            font: {
+                                weight: '600'
+                            }
+                        }
+                    }
+                }
+            };
+            
+            const winRateChartOptions = {
+                ...chartOptions,
+                plugins: {
+                    ...chartOptions.plugins,
+                    tooltip: {
+                        ...chartOptions.plugins.tooltip,
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.parsed.x}%`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    ...chartOptions.scales,
+                    x: {
+                        ...chartOptions.scales.x,
+                        min: 50,
+                        ticks: {
+                             ...chartOptions.scales.x.ticks,
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            };
+
+            const barColor = '#0284c7';
+            const barHoverColor = '#0369a1';
+
+            if (document.getElementById('content-overview').offsetParent !== null) {
+                initCharts();
+            }
+
+            function createChart(ctx, type, labels, data, options) {
+                // --- FIXED: Check chartInstances map instead of window ---
+                const chartId = ctx.canvas.id;
+                if (chartInstances[chartId]) {
+                    chartInstances[chartId].destroy();
+                }
+                // --- FIXED: Store new instance in chartInstances map ---
+                chartInstances[chartId] = new Chart(ctx, {
+                    type: type,
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Total',
+                            data: data,
+                            backgroundColor: barColor,
+                            borderColor: barColor,
+                            hoverBackgroundColor: barHoverColor,
+                            hoverBorderColor: barHoverColor,
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            barThickness: 20,
+                        }]
+                    },
+                    options: options
+                });
+            }
+
+            function initCharts() {
+                const contestedCtx = document.getElementById('contestedChart')?.getContext('2d');
+                if (contestedCtx) createChart(contestedCtx, 'bar', contestedData.labels, contestedData.values, chartOptions);
+
+                const pickedCtx = document.getElementById('pickedChart')?.getContext('2d');
+                if (pickedCtx) createChart(pickedCtx, 'bar', pickedData.labels, pickedData.values, chartOptions);
+                
+                const bannedCtx = document.getElementById('bannedChart')?.getContext('2d');
+                if (bannedCtx) createChart(bannedCtx, 'bar', bannedData.labels, bannedData.values, chartOptions);
+
+                const winRateCtx = document.getElementById('winRateChart')?.getContext('2d');
+                if (winRateCtx) createChart(winRateCtx, 'bar', winRateData.labels, winRateData.values, winRateChartOptions);
+            }
+
+            const buttons = document.querySelectorAll('.nav-button');
+            const contents = document.querySelectorAll('main section');
+
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = 'content-' + button.id.split('-')[1];
+                    const targetContent = document.getElementById(targetId);
+
+                    buttons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    contents.forEach(content => content.classList.add('hidden'));
+                    
+                    if (targetContent) {
+                        targetContent.classList.remove('hidden');
+                    }
+
+                    if (targetId === 'content-overview') {
+                        setTimeout(initCharts, 0);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
